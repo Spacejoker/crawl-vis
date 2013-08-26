@@ -1,5 +1,92 @@
 <!doctype html>
 <body>
-	Hello {{ data.name }}
+	Species: {{ data.species }} <br />
+	Background: {{ data.background }} <br />
+	<ul>
+		{% for item in data.level_list %}
+		<li>Level {{ item.level }} reached at turn {{item.turn}}</li>
+		{% endfor %}
+	</ul>
+
+	<div id="chartContainer" style="height: 300px; width: 800px;">
+	</div>
+	
+
+	<script src="{{url_for('static', filename='canvasjs.min.js') }}"></script>
+	<script>
+		var weapon_data = {{ data.weapon_data }};
+		var weapon_names = Array();
+		{% for name in data.weapon_names %}
+		weapon_names.push( '{{ name }}');
+		{% endfor %}
+		console.log(weapon_data);
+		var weapon_js_data = Array();
+		var lastcol = '';
+		for ( var j = 0 ; j < 11 ; j ++ ){
+			var bow_points = new Array();
+			var max_val = 0;
+			for ( var i = 1 ; i < weapon_data.length ; i ++) {
+				bow_points.push({x : i, y : weapon_data[i][j]});
+				max_val = Math.max(weapon_data[i][j], max_val);
+			}
+
+			//get a random color for this line, should be replaced by presets
+			var col = '#'+Math.floor(Math.random()*16777215).toString(16);
+			while(col == lastcol){
+				col = '#'+Math.floor(Math.random()*16777215).toString(16);
+			}
+			lastcol = col;
+
+			if (max_val > 0){
+
+				weapon_js_data.push(
+					{        
+						type: "line",
+						showInLegend: true,
+						lineThickness: 2,
+						name: weapon_names[j],
+						markerType: "square",
+						color: col,
+						dataPoints: bow_points
+					});
+				}
+
+
+		}
+
+		window.onload = function () {
+			var chart = new CanvasJS.Chart("chartContainer",
+			{
+
+				title:{
+					text: "Weapon Skills",
+					fontSize: 30
+				},
+				axisX:{
+
+					gridColor: "Silver",
+					tickColor: "silver",
+
+				},                        
+				toolTip:{
+					shared:true
+				},
+				theme: "theme2",
+				axisY: {
+					gridColor: "Silver",
+					tickColor: "silver"
+				},
+				legend:{
+					verticalAlign: "center",
+					horizontalAlign: "right"
+				},
+				data: weapon_js_data
+			});
+
+			chart.render();
+		}
+
+	</script>
+
 </body>
 
