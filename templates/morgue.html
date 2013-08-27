@@ -1,5 +1,16 @@
 <!doctype html>
 <body>
+	
+	<div id="weaponInfo">
+		<div class="panel panel-default" style="width: 850px;">
+			<h2>Skill Progression</h2>
+			<div id="chartContainer" style="height: 300px; width: 800px;">
+			</div>
+			<span>All weapon skills trained</span>
+		</div>
+
+	</div>
+	
 	Species: {{ data.species }} <br />
 	Background: {{ data.background }} <br />
 	<ul>
@@ -7,13 +18,11 @@
 		<li>Level {{ item.level }} reached at turn {{item.turn}}</li>
 		{% endfor %}
 	</ul>
-
-	<div id="chartContainer" style="height: 300px; width: 800px;">
-	</div>
-	
-
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
 	<script src="{{url_for('static', filename='canvasjs.min.js') }}"></script>
 	<script>
+		
+
 		var weapon_data = {{ data.weapon_data }};
 		var weapon_names = Array();
 		{% for name in data.weapon_names %}
