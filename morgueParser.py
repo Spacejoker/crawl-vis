@@ -57,7 +57,7 @@ Earth Elementalist - EE
 Venom Mage - VM
 """
 
-all_skills = ['Fighting', 'Short Blades', 'Long Blades', 'Maces and Flails', 'Axes', 'Polearms', 'Unarmed Combat', 'Bows','Throwing', 'Crossbows', 'Slings']
+all_skills = ['Fighting', 'Short Blades', 'Long Blades', u'Maces & Flails', 'Axes', 'Polearms', 'Unarmed Combat', 'Bows','Throwing', 'Crossbows', 'Slings']
 
 class MorgueParser():
 	def __init__(self, version=12):
@@ -85,6 +85,9 @@ class MorgueParser():
 		current_level = 1
 		level_skills = [[0 for y in xrange(len(all_skills))] for x in xrange(28)]
 		victorious = False
+		xl = 1
+		total_turns = 0
+		title = ""
 
 
 		#extract data from text file
@@ -107,6 +110,7 @@ class MorgueParser():
 					level = re.search("\\d+", second_half).group()
 					level_map[level] = turns
 					current_level = int(level)
+					xl = max(xl, int(level))
 
 			#Extract which species and background that is used
 			if "Began as a " in text :
@@ -134,8 +138,14 @@ class MorgueParser():
 					level_skills[current_level][skill_id] = int(skill_level)
 
 				print skill_type, "to", skill_level, "id is", skill_id, "at turn", t, "(currently level", current_level, ")"
+			if "Turns: " in text:
+				title = text.split("Turns")[0]
+				total_turns = int(re.search("\\d+", text.split("Turns")[1]).group())
 
-		print victorious
+		if victorious:
+			result = "Win"
+		else:
+			result = "Death"
 
 		for level in range(1, 28):
 			for skill_id in xrange(len(all_skills)):
@@ -147,7 +157,11 @@ class MorgueParser():
 				'background_short' : background_short,
 				'level_map' : level_map,
 				'weapon_data' : level_skills,
-				'weapon_names' : all_skills}
+				'weapon_names' : all_skills,
+				'XL' : xl,
+				'total_turns' : total_turns,
+				'title' : title,
+				'result' : result}
 
 if __name__ == '__main__':
 	pass

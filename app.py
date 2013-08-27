@@ -11,12 +11,14 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def hello_world(morgue = None):
-	url = 'http://rl.heh.fi/morgue//nago/morgue-nago-20130825-110603.txt'
-	url = 'http://dobrazupa.org/morgue/Basil/morgue-Basil-20130826-021512.txt'
-	url = 'http://crawl.akrasiac.org/rawdata/olizito/morgue-olizito-20130827-094816.txt'
-	response = urllib2.urlopen(url)
-	html = unicode(response.read(), 'utf-8')
+	#todo: handle weblinks as an alternative
+	#url = 'http://crawl.akrasiac.org/rawdata/olizito/morgue-olizito-20130827-094816.txt'
+	#response = urllib2.urlopen(url)
+	#html = unicode(response.read(), 'utf-8')
 
+	if not morgue:
+		morgue = 'morgue-Steamroller-20130827-160441.txt'
+	html = ""
 	for line in open(os.path.join(UPLOAD_FOLDER, morgue)).readlines():
 		print line
 		try:

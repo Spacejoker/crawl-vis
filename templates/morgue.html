@@ -1,6 +1,39 @@
 <!doctype html>
-<body>
-	
+<body style="background-color:grey; padding:5px;">
+
+	<table class="table table-bordered" style="width:500px; background-color:white;">
+		<tr>
+			<th colspan="2">
+				{{ data.title }}
+			</th>
+		</tr>
+		<tr>
+			<td class="span3">
+				Species / Background
+			</td>
+			<td class="span3">
+				{{ data.species }} {{ data.background }}
+				<span style="font-weight:bold">({{ data.species_short }}{{ data.background_short }})</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				XL
+			</td>
+			<td>
+				{{ data.XL }}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Result
+			</td>
+			<td>
+				{{ data.result }}
+			</td>
+		</tr>
+	</table>
+
 	<div id="weaponInfo">
 		<div class="panel panel-default" style="width: 850px;">
 			<h2>Skill Progression</h2>
@@ -24,6 +57,7 @@
 		
 
 		var weapon_data = {{ data.weapon_data }};
+		var maxlevel = {{ data.XL }};
 		var weapon_names = Array();
 		{% for name in data.weapon_names %}
 		weapon_names.push( '{{ name }}');
@@ -34,7 +68,7 @@
 		for ( var j = 0 ; j < 11 ; j ++ ){
 			var bow_points = new Array();
 			var max_val = 0;
-			for ( var i = 1 ; i < weapon_data.length ; i ++) {
+			for ( var i = 1 ; i < Math.min(maxlevel + 1, weapon_data.length) ; i ++) {
 				bow_points.push({x : i, y : weapon_data[i][j]});
 				max_val = Math.max(weapon_data[i][j], max_val);
 			}
