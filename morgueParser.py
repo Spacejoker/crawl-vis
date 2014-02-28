@@ -57,7 +57,10 @@ Earth Elementalist - EE
 Venom Mage - VM
 """
 
-all_skills = ['Fighting', 'Short Blades', 'Long Blades', u'Maces & Flails', 'Axes', 'Polearms', 'Unarmed Combat', 'Bows','Throwing', 'Crossbows', 'Slings']
+weapon_skills = ['Fighting', 'Short Blades', 'Long Blades', u'Maces & Flails', 'Axes', 'Polearms', 'Unarmed Combat', 'Staves', 'Bows','Throwing', 'Crossbows', 'Slings']
+magic_schools = [ 'Spellcasting', 'Conjurations', 'Hexes', 'Charms', 'Summonings', 'Necromancy', 'Translocations', 'Transmutations', 'Fire Magic', 'Ice Magic', 'Air Magic', 'Earth Magic', 'Poison Magic']
+defensive_schools = [ 'Armour', 'Dodging', 'Stealth', 'Shields', u'Traps', 'Stabbing', 'Invocations', 'Evocations']
+
 
 class MorgueParser():
 	def __init__(self, version=12):
@@ -77,6 +80,7 @@ class MorgueParser():
 
 	def parse(self, morgueText):
 		
+		all_skills = weapon_skills + magic_schools + defensive_schools
 		level_map = {}
 		species = ""
 		background = ""
@@ -88,7 +92,7 @@ class MorgueParser():
 		xl = 1
 		total_turns = 0
 		title = ""
-
+		shopping_list = []
 
 		#extract data from text file
 		for line, text in enumerate(morgueText.split("\n")):
@@ -141,6 +145,8 @@ class MorgueParser():
 			if "Turns: " in text:
 				title = text.split("Turns")[0]
 				total_turns = int(re.search("\\d+", text.split("Turns")[1]).group())
+			if "Bought" in text:
+				shopping_list.append(text)
 
 		if victorious:
 			result = "Win"
@@ -161,7 +167,9 @@ class MorgueParser():
 				'XL' : xl,
 				'total_turns' : total_turns,
 				'title' : title,
-				'result' : result}
+				'result' : result,
+				'nr_of_skills' : len(level_skills),
+				'shopping_list' : shopping_list}
 
 if __name__ == '__main__':
 	pass

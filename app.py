@@ -10,22 +10,10 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
-def hello_world(morgue = None):
-	#todo: handle weblinks as an alternative
-	#url = 'http://crawl.akrasiac.org/rawdata/olizito/morgue-olizito-20130827-094816.txt'
-	#response = urllib2.urlopen(url)
-	#html = unicode(response.read(), 'utf-8')
-
-	if not morgue:
-		morgue = 'morgue-Steamroller-20130827-160441.txt'
-	html = ""
-	for line in open(os.path.join(UPLOAD_FOLDER, morgue)).readlines():
-		print line
-		try:
-			html += unicode(line, 'utf-8') + "\n"
-		except:
-			pass
-
+def hello_world(html=None):
+	if not html:
+		return 'no file'
+	
 	data = MorgueParser().parse(html)
 	
 	#format some stuff for the web
@@ -41,24 +29,47 @@ def hello_world(morgue = None):
 	return render_template('morgue.html', data=data)
 
 
+@app.route('/link', methods=['GET', 'POST'])
+def link_filk():
+	if request.method == 'POST':
+		url = request.form['fileurl']
+		response = urllib2.urlopen(url)
+		html = unicode(response.read(), 'utf-8')
+		return hello_world(html)
+	return '''
+	<!doctype html>
+	<title>Provide morgue link</title>
+	<h1>Provide morgue link</h1>
+	<form action="" method=post enctype=multipart/form-data>
+	<p><input type=text name=fileurl>
+	 <input type=submit value=Upload>
+	</form>
+	'''
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    if request.method == 'POST':
-        file = request.files['file']
-	if file: #allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-	    return hello_world(file.filename)
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form action="" method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    '''
+	if request.method == 'POST':
+		file = request.files['file']
+		if file: #allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			html = ""
+			for line in open(os.path.join(UPLOAD_FOLDER, filename)).readlines():
+				print line
+				try:
+					html += unicode(line, 'utf-8') + "\n"
+				except:
+					pass
+			return hello_world(html)
+	return '''
+	<!doctype html>
+	<title>Upload new File</title>
+	<h1>Upload new File</h1>
+	<form action="" method=post enctype=multipart/form-data>
+	<p><input type=file name=file>
+	 <input type=submit value=Upload>
+	</form>
+	'''
 
 
 if __name__ == '__main__':

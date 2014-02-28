@@ -34,6 +34,16 @@
 		</tr>
 	</table>
 
+	<button class='btn' id='weaponGraphButton'>
+		Weapons
+	</button>
+	<button class='btn' id='magicGraphButton'>
+		Magic
+	</button>
+	<button class='btn' id='defenceGraphButton'>
+		Defensive and Misc
+	</button>
+
 	<div id="weaponInfo">
 		<div class="panel panel-default" style="width: 850px;">
 			<h2>Skill Progression</h2>
@@ -43,7 +53,13 @@
 		</div>
 
 	</div>
-	
+	<div style="background-color:white; width:600px;">
+		<ul>
+			{% for item in data.shopping_list %}
+			<li>{{item}}</li>
+			{% endfor %}
+		</ul>
+	</div>
 	Species: {{ data.species }} <br />
 	Background: {{ data.background }} <br />
 	<ul>
@@ -54,7 +70,6 @@
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
 	<script src="{{url_for('static', filename='canvasjs.min.js') }}"></script>
 	<script>
-		
 
 		var weapon_data = {{ data.weapon_data }};
 		var maxlevel = {{ data.XL }};
@@ -65,24 +80,41 @@
 		console.log(weapon_data);
 		var weapon_js_data = Array();
 		var lastcol = '';
-		for ( var j = 0 ; j < 11 ; j ++ ){
-			var bow_points = new Array();
-			var max_val = 0;
-			for ( var i = 1 ; i < Math.min(maxlevel + 1, weapon_data.length) ; i ++) {
-				bow_points.push({x : i, y : weapon_data[i][j]});
-				max_val = Math.max(weapon_data[i][j], max_val);
+
+		var title = "";
+		setupData = function(graphNr) {
+			weapon_js_data = Array();
+			var from = 0;
+			var to = 12;
+			title = "Weapons and Fighting";
+			if( graphNr == 1){
+				from = 12;
+				to = 25;
+				title = "Magic and Spellcasting";
 			}
-
-			//get a random color for this line, should be replaced by presets
-			var col = '#'+Math.floor(Math.random()*16777215).toString(16);
-			while(col == lastcol){
-				col = '#'+Math.floor(Math.random()*16777215).toString(16);
+			if( graphNr == 2){
+				from = 25;
+				to = 33;
+				title = "Defensive and Misc";
 			}
-			lastcol = col;
+			for ( var j = from ; j < to ; j ++ ){
+				var bow_points = new Array();
+				var max_val = 0;
+				for ( var i = 1 ; i < Math.min(maxlevel + 1, weapon_data.length) ; i ++) {
+					bow_points.push({x : i, y : weapon_data[i][j]});
+					max_val = Math.max(weapon_data[i][j], max_val);
+				}
 
-			if (max_val > 0){
+				//get a random color for this line, should be replaced by presets
+				var col = '#'+Math.floor(Math.random()*16777215).toString(16);
+				while(col == lastcol){
+					col = '#'+Math.floor(Math.random()*16777215).toString(16);
+				}
+				lastcol = col;
 
-				weapon_js_data.push(
+				if (max_val > 0){
+
+					weapon_js_data.push(
 					{        
 						type: "line",
 						showInLegend: true,
@@ -95,14 +127,21 @@
 				}
 
 
-		}
+			}
+		};
 
-		window.onload = function () {
+		window.onload = function () {drawGraph(0);
+			document.getElementById("weaponGraphButton").onclick = function(){drawGraph(0)};
+			document.getElementById("magicGraphButton").onclick = function(){drawGraph(1)};
+			document.getElementById("defenceGraphButton").onclick = function(){drawGraph(2)};
+		}
+		drawGraph = function (graphNr) {
+			setupData(graphNr);
 			var chart = new CanvasJS.Chart("chartContainer",
 			{
 
 				title:{
-					text: "Weapons and Fighting",
+					text: title,
 					fontSize: 30
 				},
 				axisX:{
@@ -128,7 +167,8 @@
 
 			chart.render();
 		}
-
+	
+		
 	</script>
 
 </body>
